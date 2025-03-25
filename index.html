@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <h1>එකතු කිරීම සඳහා උදාහරණය - Addition Example</h1> -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f8ff;
+            padding: 20px;
+        }
+        h1 {
+            color: white;
+            margin-bottom: 30px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #341c7a;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .addition-box {
+            font-size: 2.5em;
+            font-family: monospace;
+            margin: 20px auto;
+            position: relative;
+            width: 200px;
+        }
+        .number {
+            text-align: right;
+            height: 1.2em;
+            position: relative;
+            color: white;
+        }
+        .carry {
+            position: absolute;
+            top: -0.8em;
+            color: #e74c3c;
+            font-size: 0.6em;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        
+        .line {
+            border-bottom: 2px solid #2c3e50;
+            margin: 5px 0;
+        }
+        .highlight {
+            /* background-color: green; */
+            border-radius: 2px;
+            padding-left: 5px;
+            padding-right: 5px;
+            animation: pulse 1s infinite alternate;
+        }
+        @keyframes pulse {
+            from { background-color: #42D674; }
+            to { background-color: #42D674; }
+        }
+        .buttons {
+            margin-top: 30px;
+        }
+        button {
+            background-color: #ff634a;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #f33e21;
+        }
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .explanation {
+            margin-top: 20px;
+            text-align: left;
+            font-size: 1.2em;
+            color: #2c3e50;
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .digit {
+            display: inline-block;
+            width: 0.6em;
+            text-align: center;
+            margin-right: 20px;
+        }
+        .lang-buttons {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- <div class="lang-buttons">
+            <button id="sinhalaBtn">සිංහල</button>
+            <button id="englishBtn">English</button>
+        </div> -->
+        
+        <h1 id="title">එකතු කිරීම - උදාහරණය</h1>
+        
+        <div class="addition-box">
+            <div class="number">
+                <span class="carry" id="carry1" style="right: 0.6em;">1</span>
+                <span class="carry" id="carry2" style="right: 1.8em;">1</span>
+                <span class="carry" id="carry3" style="right: 3.0em;">1</span>
+                <span class="digit" id="num1-1">4</span><span class="digit" id="num1-2">2</span><span class="digit" id="num1-3">7</span><span class="digit" id="num1-4">8</span>
+            </div>
+            <div class="number">
+                <span class="digit" id="num2-1">1</span><span class="digit" id="num2-2">3</span><span class="digit" id="num2-3">5</span><span class="digit" id="num2-4">1</span>
+            </div>
+            <div class="line"></div>
+            <div class="number" id="result">
+                <span class="digit" id="res-1">5</span><span class="digit" id="res-2">6</span><span class="digit" id="res-3">2</span><span class="digit" id="res-4">9</span>
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <button id="prevBtn" disabled>පෙර පියවර</button>
+            <button id="nextBtn">ඊළඟ පියවර</button>
+            <button id="resetBtn">නැවත සකසන්න</button>
+        </div>
+        
+        <div class="explanation" id="explanation">
+            එකතු කිරීමට සූදානම් වන්න!
+        </div>
+    </div>
+
+    <script>
+        // Create language translations
+        const translations = {
+            sinhala: {
+                title: "එකතු කිරීම - උදාහරණය",
+                prev: "පෙර පියවර",
+                next: "ඊළඟ පියවර",
+                reset: "නැවත සකසන්න",
+                ready: "එකතු කිරීමට සූදානම් වන්න!",
+                steps: [
+                    "දකුණේ සිට වමට එකතු කරමු. පළමුව, 8 + 1 = 9 එකතු කරමු.",
+                    "දෙවැනි තීරුව: 7 + 5 = 12. මෙහිදී 2 ලියා 1 ඉදිරියට ගෙන යමු.",
+                    "තුන්වැනි තීරුව: 2 + 3 + 1 (ගෙනා 1) = 6.",
+                    "අවසාන තීරුව: 4 + 1 = 5.",
+                    "අංක සියල්ල එකතු කර අවසන්! පිළිතුර 5629."
+                ],
+                final: "4278 + 1351 = 5629 සම්පූර්ණයි!"
+            },
+            english: {
+                title: "Addition - Example",
+                prev: "Previous Step",
+                next: "Next Step",
+                reset: "Reset",
+                ready: "Get ready to add!",
+                steps: [
+                    "Let's add from right to left. First, add 8 + 1 = 9.",
+                    "Second column: 7 + 5 = 12. Write 2 and carry 1.",
+                    "Third column: 2 + 3 + 1 (carried) = 6.",
+                    "Final column: 4 + 1 = 5.",
+                    "All digits added! The answer is 5629."
+                ],
+                final: "4278 + 1351 = 5629 Complete!"
+            }
+        };
+        
+        let currentLanguage = "sinhala";
+        let currentStep = 0;
+        const totalSteps = 5;
+        
+        function updateLanguage() {
+            document.getElementById("title").textContent = translations[currentLanguage].title;
+            document.getElementById("prevBtn").textContent = translations[currentLanguage].prev;
+            document.getElementById("nextBtn").textContent = translations[currentLanguage].next;
+            document.getElementById("resetBtn").textContent = translations[currentLanguage].reset;
+            
+            if (currentStep === 0) {
+                document.getElementById("explanation").textContent = translations[currentLanguage].ready;
+            } else if (currentStep === totalSteps) {
+                document.getElementById("explanation").textContent = translations[currentLanguage].final;
+            } else {
+                document.getElementById("explanation").textContent = translations[currentLanguage].steps[currentStep - 1];
+            }
+        }
+        
+        // document.getElementById("sinhalaBtn").addEventListener("click", function() {
+        //     currentLanguage = "sinhala";
+        //     updateLanguage();
+        // });
+        
+        // document.getElementById("englishBtn").addEventListener("click", function() {
+        //     currentLanguage = "english";
+        //     updateLanguage();
+        // });
+        
+        function updateStep() {
+            // Reset all highlights and carries
+            document.querySelectorAll(".digit").forEach(el => el.classList.remove("highlight"));
+            document.querySelectorAll(".carry").forEach(el => el.style.opacity = "0");
+            
+            // Update button states
+            document.getElementById("prevBtn").disabled = (currentStep === 0);
+            document.getElementById("nextBtn").disabled = (currentStep === totalSteps);
+            
+            // Update explanation
+            if (currentStep === 0) {
+                document.getElementById("explanation").textContent = translations[currentLanguage].ready;
+                // Hide result initially
+                document.getElementById("result").style.visibility = "hidden";
+            } else if (currentStep === totalSteps) {
+                document.getElementById("explanation").textContent = translations[currentLanguage].final;
+            } else {
+                document.getElementById("explanation").textContent = translations[currentLanguage].steps[currentStep - 1];
+            }
+            
+            // Show relevant parts for each step
+            switch(currentStep) {
+                case 1: // First column: 8 + 1 = 9
+                    document.getElementById("num1-4").classList.add("highlight");
+                    document.getElementById("num2-4").classList.add("highlight");
+                    document.getElementById("res-4").classList.add("highlight");
+                    document.getElementById("result").style.visibility = "visible";
+                    document.getElementById("res-1").style.visibility = "hidden";
+                    document.getElementById("res-2").style.visibility = "hidden";
+                    document.getElementById("res-3").style.visibility = "hidden";
+                    document.getElementById("res-4").style.visibility = "visible";
+                    break;
+                case 2: // Second column: 7 + 5 = 12
+                    document.getElementById("num1-3").classList.add("highlight");
+                    document.getElementById("num2-3").classList.add("highlight");
+                    document.getElementById("res-3").classList.add("highlight");
+                    document.getElementById("carry1").style.opacity = "1";
+                    document.getElementById("result").style.visibility = "visible";
+                    document.getElementById("res-1").style.visibility = "hidden";
+                    document.getElementById("res-2").style.visibility = "hidden";
+                    document.getElementById("res-3").style.visibility = "visible";
+                    document.getElementById("res-4").style.visibility = "visible";
+                    break;
+                case 3: // Third column: 2 + 3 + 1 = 6
+                    document.getElementById("num1-2").classList.add("highlight");
+                    document.getElementById("num2-2").classList.add("highlight");
+                    document.getElementById("res-2").classList.add("highlight");
+                    document.getElementById("carry1").style.opacity = "1";
+                    document.getElementById("result").style.visibility = "visible";
+                    document.getElementById("res-1").style.visibility = "hidden";
+                    document.getElementById("res-2").style.visibility = "visible";
+                    document.getElementById("res-3").style.visibility = "visible";
+                    document.getElementById("res-4").style.visibility = "visible";
+                    break;
+                case 4: // Fourth column: 4 + 1 = 5
+                    document.getElementById("num1-1").classList.add("highlight");
+                    document.getElementById("num2-1").classList.add("highlight");
+                    document.getElementById("res-1").classList.add("highlight");
+                    document.getElementById("result").style.visibility = "visible";
+                    document.getElementById("res-1").style.visibility = "visible";
+                    document.getElementById("res-2").style.visibility = "visible";
+                    document.getElementById("res-3").style.visibility = "visible";
+                    document.getElementById("res-4").style.visibility = "visible";
+                    break;
+                case 5: // All done
+                    document.getElementById("result").style.visibility = "visible";
+                    document.getElementById("res-1").style.visibility = "visible";
+                    document.getElementById("res-2").style.visibility = "visible";
+                    document.getElementById("res-3").style.visibility = "visible";
+                    document.getElementById("res-4").style.visibility = "visible";
+                    break;
+            }
+        }
+        
+        document.getElementById("nextBtn").addEventListener("click", function() {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateStep();
+            }
+        });
+        
+        document.getElementById("prevBtn").addEventListener("click", function() {
+            if (currentStep > 0) {
+                currentStep--;
+                updateStep();
+            }
+        });
+        
+        document.getElementById("resetBtn").addEventListener("click", function() {
+            currentStep = 0;
+            updateStep();
+        });
+        
+        // Initialize
+        updateLanguage();
+        updateStep();
+    </script>
+</body>
+</html>
