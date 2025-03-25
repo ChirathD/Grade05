@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <h1>එකතු කිරීම සඳහා උදාහරණය - Addition Example</h1> -->
+    <!-- <title>එකතු කිරීම සඳහා උදාහරණය - Addition Example</title> -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,7 +13,7 @@
         }
         h1 {
             color: white;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
         .container {
             max-width: 600px;
@@ -28,12 +28,13 @@
             font-family: monospace;
             margin: 20px auto;
             position: relative;
-            width: 200px;
+            display: inline-block;
         }
         .number {
             text-align: right;
             height: 1.2em;
             position: relative;
+            white-space: nowrap;
             color: white;
         }
         .carry {
@@ -43,18 +44,19 @@
             font-size: 0.6em;
             opacity: 0;
             transition: opacity 0.5s;
+            width: 0.6em;
+            text-align: center;
         }
-        
         .line {
             border-bottom: 2px solid #2c3e50;
             margin: 5px 0;
         }
         .highlight {
-            /* background-color: green; */
-            border-radius: 2px;
+            background-color: #f1c40f;
+            border-radius: 4px;
+            animation: pulse 1s infinite alternate;
             padding-left: 5px;
             padding-right: 5px;
-            animation: pulse 1s infinite alternate;
         }
         @keyframes pulse {
             from { background-color: #42D674; }
@@ -95,9 +97,20 @@
             width: 0.6em;
             text-align: center;
             margin-right: 20px;
+            font-size: 32px;
         }
         .lang-buttons {
             margin-bottom: 20px;
+        }
+        .input-section {
+            margin-bottom: 20px;
+        }
+        input {
+            font-size: 1.2em;
+            padding: 8px;
+            width: 150px;
+            margin: 0 5px;
+            text-align: right;
         }
     </style>
 </head>
@@ -110,20 +123,15 @@
         
         <h1 id="title">එකතු කිරීම - උදාහරණය</h1>
         
-        <div class="addition-box">
-            <div class="number">
-                <span class="carry" id="carry1" style="right: 0.6em;">1</span>
-                <span class="carry" id="carry2" style="right: 1.8em;">1</span>
-                <span class="carry" id="carry3" style="right: 3.0em;">1</span>
-                <span class="digit" id="num1-1">4</span><span class="digit" id="num1-2">2</span><span class="digit" id="num1-3">7</span><span class="digit" id="num1-4">8</span>
-            </div>
-            <div class="number">
-                <span class="digit" id="num2-1">1</span><span class="digit" id="num2-2">3</span><span class="digit" id="num2-3">5</span><span class="digit" id="num2-4">1</span>
-            </div>
-            <div class="line"></div>
-            <div class="number" id="result">
-                <span class="digit" id="res-1">5</span><span class="digit" id="res-2">6</span><span class="digit" id="res-3">2</span><span class="digit" id="res-4">9</span>
-            </div>
+        <div class="input-section">
+            <input type="number" id="number1" value="4278" min="0">
+            +
+            <input type="number" id="number2" value="1351" min="0">
+            <button id="calculateBtn">එකතු කරන්න</button>
+        </div>
+        
+        <div class="addition-box" id="addition-box">
+            <!-- This will be filled dynamically -->
         </div>
         
         <div class="buttons">
@@ -142,136 +150,280 @@
         const translations = {
             sinhala: {
                 title: "එකතු කිරීම - උදාහරණය",
+                calculate: "එකතු කරන්න",
                 prev: "පෙර පියවර",
                 next: "ඊළඟ පියවර",
                 reset: "නැවත සකසන්න",
                 ready: "එකතු කිරීමට සූදානම් වන්න!",
-                steps: [
-                    "දකුණේ සිට වමට එකතු කරමු. පළමුව, 8 + 1 = 9 එකතු කරමු.",
-                    "දෙවැනි තීරුව: 7 + 5 = 12. මෙහිදී 2 ලියා 1 ඉදිරියට ගෙන යමු.",
-                    "තුන්වැනි තීරුව: 2 + 3 + 1 (ගෙනා 1) = 6.",
-                    "අවසාන තීරුව: 4 + 1 = 5.",
-                    "අංක සියල්ල එකතු කර අවසන්! පිළිතුර 5629."
-                ],
-                final: "4278 + 1351 = 5629 සම්පූර්ණයි!"
+                stepStart: "දකුණේ සිට වමට එකතු කරමු. පළමුව, ",
+                stepAdd: " + ",
+                stepEquals: " = ",
+                stepCarry: ". මෙහිදී ",
+                stepCarryWrite: " ලියා ",
+                stepCarryForward: " ඉදිරියට ගෙන යමු.",
+                stepCarryAdd: " (ගෙනා) ",
+                stepComplete: "අංක සියල්ල එකතු කර අවසන්! පිළිතුර ",
+                stepFinal: " සම්පූර්ණයි!"
             },
             english: {
                 title: "Addition - Example",
+                calculate: "Calculate",
                 prev: "Previous Step",
                 next: "Next Step",
                 reset: "Reset",
                 ready: "Get ready to add!",
-                steps: [
-                    "Let's add from right to left. First, add 8 + 1 = 9.",
-                    "Second column: 7 + 5 = 12. Write 2 and carry 1.",
-                    "Third column: 2 + 3 + 1 (carried) = 6.",
-                    "Final column: 4 + 1 = 5.",
-                    "All digits added! The answer is 5629."
-                ],
-                final: "4278 + 1351 = 5629 Complete!"
+                stepStart: "Let's add from right to left. First, ",
+                stepAdd: " + ",
+                stepEquals: " = ",
+                stepCarry: ". Write ",
+                stepCarryWrite: " and carry ",
+                stepCarryForward: ".",
+                stepCarryAdd: " (carried) ",
+                stepComplete: "All digits added! The answer is ",
+                stepFinal: " Complete!"
             }
         };
         
         let currentLanguage = "sinhala";
         let currentStep = 0;
-        const totalSteps = 5;
+        let totalSteps = 0;
+        let num1 = "4278";
+        let num2 = "1351";
+        let result = "5629";
+        let carries = [];
+        let digitResults = [];
+        
+        function padNumbers() {
+            // Make both numbers the same length by padding with leading zeros
+            const maxLength = Math.max(num1.length, num2.length);
+            num1 = num1.padStart(maxLength, '0');
+            num2 = num2.padStart(maxLength, '0');
+            return maxLength;
+        }
+        
+        function calculateAddition() {
+            // Read input values
+            num1 = document.getElementById("number1").value;
+            num2 = document.getElementById("number2").value;
+            
+            // Validate inputs
+            if (!num1 || !num2 || isNaN(num1) || isNaN(num2) || parseInt(num1) < 0 || parseInt(num2) < 0) {
+                alert("Please enter valid positive numbers");
+                return;
+            }
+            
+            // Calculate the result
+            const sum = parseInt(num1) + parseInt(num2);
+            result = sum.toString();
+            
+            // Reset the animation
+            currentStep = 0;
+            
+            // Pad numbers to equal length
+            const maxLength = padNumbers();
+            
+            // Calculate carries and intermediate results
+            carries = [];
+            digitResults = [];
+            
+            let carry = 0;
+            for (let i = maxLength - 1; i >= 0; i--) {
+                const digit1 = parseInt(num1.charAt(i));
+                const digit2 = parseInt(num2.charAt(i));
+                const digitSum = digit1 + digit2 + carry;
+                
+                digitResults.unshift(digitSum % 10);
+                carry = Math.floor(digitSum / 10);
+                carries.unshift(carry);
+            }
+            
+            // If there's a final carry, add it to the results
+            if (carry > 0) {
+                digitResults.unshift(carry);
+                num1 = '0' + num1;
+                num2 = '0' + num2;
+                carries.unshift(0);
+            }
+            
+            // Set total steps (one per digit plus final result)
+            totalSteps = digitResults.length + 1;
+            
+            // Generate the HTML for the addition box
+            renderAdditionBox();
+            
+            // Update the explanation
+            updateStep();
+        }
+        
+        function renderAdditionBox() {
+            const additionBox = document.getElementById("addition-box");
+            
+            // Create HTML structure
+            let html = `
+                <div class="number">
+            `;
+            
+            // Add carry places
+            for (let i = 0; i < num1.length; i++) {
+                html += `<span class="carry" id="carry-${i}" style="right: ${(num1.length - i) * 0.6}em;">1</span>`;
+            }
+            
+            // Add first number digits
+            for (let i = 0; i < num1.length; i++) {
+                html += `<span class="digit" id="num1-${i}">${num1.charAt(i)}</span>`;
+            }
+            
+            html += `
+                </div>
+                <div class="number">
+            `;
+            
+            // Add second number digits
+            for (let i = 0; i < num2.length; i++) {
+                html += `<span class="digit" id="num2-${i}">${num2.charAt(i)}</span>`;
+            }
+            
+            html += `
+                </div>
+                <div class="line"></div>
+                <div class="number" id="result">
+            `;
+            
+            // Add result digits
+            for (let i = 0; i < digitResults.length; i++) {
+                html += `<span class="digit" id="res-${i}">${digitResults[i]}</span>`;
+            }
+            
+            html += `
+                </div>
+            `;
+            
+            additionBox.innerHTML = html;
+            
+            // Hide result initially
+            document.getElementById("result").style.visibility = "hidden";
+        }
         
         function updateLanguage() {
             document.getElementById("title").textContent = translations[currentLanguage].title;
+            document.getElementById("calculateBtn").textContent = translations[currentLanguage].calculate;
             document.getElementById("prevBtn").textContent = translations[currentLanguage].prev;
             document.getElementById("nextBtn").textContent = translations[currentLanguage].next;
             document.getElementById("resetBtn").textContent = translations[currentLanguage].reset;
             
-            if (currentStep === 0) {
-                document.getElementById("explanation").textContent = translations[currentLanguage].ready;
-            } else if (currentStep === totalSteps) {
-                document.getElementById("explanation").textContent = translations[currentLanguage].final;
-            } else {
-                document.getElementById("explanation").textContent = translations[currentLanguage].steps[currentStep - 1];
-            }
+            updateStep();
         }
         
-        // document.getElementById("sinhalaBtn").addEventListener("click", function() {
-        //     currentLanguage = "sinhala";
-        //     updateLanguage();
-        // });
-        
-        // document.getElementById("englishBtn").addEventListener("click", function() {
-        //     currentLanguage = "english";
-        //     updateLanguage();
-        // });
+        function getStepExplanation(step) {
+            if (step === 0) {
+                return translations[currentLanguage].ready;
+            } else if (step === totalSteps) {
+                return `${num1} + ${num2} = ${result} ${translations[currentLanguage].stepFinal}`;
+            } else {
+                // Index for the current digit (right to left)
+                const digitIndex = digitResults.length - step;
+                
+                // Get the current digit values
+                const digit1 = parseInt(num1.charAt(digitIndex));
+                const digit2 = parseInt(num2.charAt(digitIndex));
+                
+                // Get the carry coming in (if any)
+                const incomingCarry = (digitIndex < digitResults.length - 1) ? carries[digitIndex + 1] : 0;
+                
+                // Get the result and outgoing carry
+                const digitResult = digitResults[digitIndex];
+                const outgoingCarry = carries[digitIndex];
+                
+                // Build explanation
+                let explanation = "";
+                if (step === 1) {
+                    explanation += translations[currentLanguage].stepStart;
+                }
+                
+                // Basic addition
+                explanation += digit1 + translations[currentLanguage].stepAdd + digit2;
+                
+                // Add incoming carry if exists
+                if (incomingCarry > 0) {
+                    explanation += translations[currentLanguage].stepAdd + incomingCarry + translations[currentLanguage].stepCarryAdd;
+                }
+                
+                // Addition result
+                explanation += translations[currentLanguage].stepEquals + (digit1 + digit2 + incomingCarry);
+                
+                // Explain carry if needed
+                if (outgoingCarry > 0) {
+                    explanation += translations[currentLanguage].stepCarry + digitResult + 
+                                   translations[currentLanguage].stepCarryWrite + outgoingCarry + 
+                                   translations[currentLanguage].stepCarryForward;
+                }
+                
+                // If it's the last digit operation
+                if (step === totalSteps - 1) {
+                    explanation += " " + translations[currentLanguage].stepComplete + result + ".";
+                }
+                
+                return explanation;
+            }
+        }
         
         function updateStep() {
             // Reset all highlights and carries
             document.querySelectorAll(".digit").forEach(el => el.classList.remove("highlight"));
             document.querySelectorAll(".carry").forEach(el => el.style.opacity = "0");
             
+            // If no calculation has been done yet
+            if (totalSteps === 0) {
+                document.getElementById("explanation").textContent = translations[currentLanguage].ready;
+                return;
+            }
+            
             // Update button states
             document.getElementById("prevBtn").disabled = (currentStep === 0);
             document.getElementById("nextBtn").disabled = (currentStep === totalSteps);
             
             // Update explanation
+            document.getElementById("explanation").textContent = getStepExplanation(currentStep);
+            
+            // If at the start, hide result
             if (currentStep === 0) {
-                document.getElementById("explanation").textContent = translations[currentLanguage].ready;
-                // Hide result initially
                 document.getElementById("result").style.visibility = "hidden";
-            } else if (currentStep === totalSteps) {
-                document.getElementById("explanation").textContent = translations[currentLanguage].final;
-            } else {
-                document.getElementById("explanation").textContent = translations[currentLanguage].steps[currentStep - 1];
+                return;
             }
             
-            // Show relevant parts for each step
-            switch(currentStep) {
-                case 1: // First column: 8 + 1 = 9
-                    document.getElementById("num1-4").classList.add("highlight");
-                    document.getElementById("num2-4").classList.add("highlight");
-                    document.getElementById("res-4").classList.add("highlight");
-                    document.getElementById("result").style.visibility = "visible";
-                    document.getElementById("res-1").style.visibility = "hidden";
-                    document.getElementById("res-2").style.visibility = "hidden";
-                    document.getElementById("res-3").style.visibility = "hidden";
-                    document.getElementById("res-4").style.visibility = "visible";
-                    break;
-                case 2: // Second column: 7 + 5 = 12
-                    document.getElementById("num1-3").classList.add("highlight");
-                    document.getElementById("num2-3").classList.add("highlight");
-                    document.getElementById("res-3").classList.add("highlight");
-                    document.getElementById("carry1").style.opacity = "1";
-                    document.getElementById("result").style.visibility = "visible";
-                    document.getElementById("res-1").style.visibility = "hidden";
-                    document.getElementById("res-2").style.visibility = "hidden";
-                    document.getElementById("res-3").style.visibility = "visible";
-                    document.getElementById("res-4").style.visibility = "visible";
-                    break;
-                case 3: // Third column: 2 + 3 + 1 = 6
-                    document.getElementById("num1-2").classList.add("highlight");
-                    document.getElementById("num2-2").classList.add("highlight");
-                    document.getElementById("res-2").classList.add("highlight");
-                    document.getElementById("carry1").style.opacity = "1";
-                    document.getElementById("result").style.visibility = "visible";
-                    document.getElementById("res-1").style.visibility = "hidden";
-                    document.getElementById("res-2").style.visibility = "visible";
-                    document.getElementById("res-3").style.visibility = "visible";
-                    document.getElementById("res-4").style.visibility = "visible";
-                    break;
-                case 4: // Fourth column: 4 + 1 = 5
-                    document.getElementById("num1-1").classList.add("highlight");
-                    document.getElementById("num2-1").classList.add("highlight");
-                    document.getElementById("res-1").classList.add("highlight");
-                    document.getElementById("result").style.visibility = "visible";
-                    document.getElementById("res-1").style.visibility = "visible";
-                    document.getElementById("res-2").style.visibility = "visible";
-                    document.getElementById("res-3").style.visibility = "visible";
-                    document.getElementById("res-4").style.visibility = "visible";
-                    break;
-                case 5: // All done
-                    document.getElementById("result").style.visibility = "visible";
-                    document.getElementById("res-1").style.visibility = "visible";
-                    document.getElementById("res-2").style.visibility = "visible";
-                    document.getElementById("res-3").style.visibility = "visible";
-                    document.getElementById("res-4").style.visibility = "visible";
-                    break;
+            // Show result
+            document.getElementById("result").style.visibility = "visible";
+            
+            // If at the end, show all digits and exit
+            if (currentStep === totalSteps) {
+                for (let i = 0; i < digitResults.length; i++) {
+                    document.getElementById(`res-${i}`).style.visibility = "visible";
+                }
+                return;
+            }
+            
+            // Processing steps (1 to totalSteps-1)
+            // Index for the current digit (right to left)
+            const digitIndex = digitResults.length - currentStep;
+            
+            // Hide future digits
+            for (let i = 0; i < digitIndex; i++) {
+                document.getElementById(`res-${i}`).style.visibility = "hidden";
+            }
+            
+            // Show current and past digits
+            for (let i = digitIndex; i < digitResults.length; i++) {
+                document.getElementById(`res-${i}`).style.visibility = "visible";
+            }
+            
+            // Highlight current digits
+            document.getElementById(`num1-${digitIndex}`).classList.add("highlight");
+            document.getElementById(`num2-${digitIndex}`).classList.add("highlight");
+            document.getElementById(`res-${digitIndex}`).classList.add("highlight");
+            
+            // Show carries if needed
+            if (digitIndex > 0 && carries[digitIndex] > 0) {
+                document.getElementById(`carry-${digitIndex-1}`).style.opacity = "1";
             }
         }
         
@@ -294,9 +446,23 @@
             updateStep();
         });
         
+        document.getElementById("calculateBtn").addEventListener("click", calculateAddition);
+        
+        // document.getElementById("sinhalaBtn").addEventListener("click", function() {
+        //     currentLanguage = "sinhala";
+        //     updateLanguage();
+        // });
+        
+        // document.getElementById("englishBtn").addEventListener("click", function() {
+        //     currentLanguage = "english";
+        //     updateLanguage();
+        // });
+        
         // Initialize
         updateLanguage();
-        updateStep();
+        
+        // Initial setup
+        calculateAddition();
     </script>
 </body>
 </html>
